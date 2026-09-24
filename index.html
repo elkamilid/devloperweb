@@ -1,0 +1,2433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>devloperweb.com — Pengembangan Web Premium untuk Pemilik Bisnis</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- RESET & BASE ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #fafbfc;
+            color: #0b1b2b;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ---------- VARIABLES ---------- */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --accent: #7c3aed;
+            --dark: #0a0f1c;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.08);
+            --gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            --gradient-soft: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            --glass: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        /* ---------- TYPOGRAPHY ---------- */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        .text-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        section {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           DYNAMIC MESH NETWORK CANVAS BACKGROUND
+           Jaringan node yang bergerak & saling terhubung
+           ============================================================ */
+        .mesh-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        /* Varian opacity untuk section berbeda */
+        .mesh-canvas.soft { opacity: 0.5; }
+        .mesh-canvas.bright { opacity: 1; }
+
+        /* Ambient glow overlay per section */
+        .hero::after,
+        .features::after,
+        .pricing::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 30%, rgba(37, 99, 235, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 85% 70%, rgba(124, 58, 237, 0.05) 0%, transparent 45%);
+            pointer-events: none;
+            z-index: 1;
+            animation: ambientGlow 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes ambientGlow {
+            0%   { opacity: 0.3; }
+            100% { opacity: 0.85; }
+        }
+
+        /* ---------- SCROLL REVEAL ---------- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+
+        /* ---------- NAVBAR ---------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 16px 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            padding: 12px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+            color: var(--dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            font-size: 0.8rem;
+            background: var(--gray-100);
+            padding: 4px 8px;
+            border-radius: 30px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .lang-switch span {
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .lang-switch span.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .lang-switch span:hover {
+            color: var(--primary);
+        }
+
+        .nav-cta {
+            background: var(--gradient);
+            color: var(--white);
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        /* ---------- HERO ---------- */
+        .hero {
+            padding-top: 180px;
+            padding-bottom: 100px;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 40px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .hero h1 {
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            max-width: 520px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 36px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark);
+            border: 1px solid var(--gray-200);
+            padding: 16px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat-item h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .stat-item p {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+            transition: transform 0.6s ease;
+        }
+
+        .hero-card:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+        }
+
+        .hero-card .mockup-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .hero-card .mockup-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gray-200);
+        }
+
+        .hero-card .mockup-dot:nth-child(1) { background: #ff5f56; }
+        .hero-card .mockup-dot:nth-child(2) { background: #ffbd2e; }
+        .hero-card .mockup-dot:nth-child(3) { background: #27c93f; }
+
+        .hero-card .mockup-line {
+            height: 12px;
+            background: var(--gray-100);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .hero-card .mockup-line.short { width: 60%; }
+
+        .hero-card .mockup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .hero-card .mockup-block {
+            height: 80px;
+            background: var(--gradient-soft);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ---------- SOCIAL PROOF ---------- */
+        .social-proof {
+            padding: 60px 0;
+            background: var(--white);
+            border-top: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .social-proof p {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .logo-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .logo-grid span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gray-200);
+            transition: color 0.3s ease;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-grid span:hover {
+            color: var(--gray-600);
+        }
+
+        /* ---------- FEATURES ---------- */
+        .features {
+            background: var(--gray-50);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 64px;
+        }
+
+        .section-header h2 { margin-bottom: 16px; }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            border: 1px solid var(--gray-100);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--gradient-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--gradient);
+            color: var(--white);
+            transform: scale(1.05);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        /* ---------- SHOWCASE ---------- */
+        .showcase {
+            background: var(--white);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .showcase-content h2 { margin-bottom: 24px; }
+
+        .showcase-content p {
+            color: var(--gray-600);
+            font-size: 1.05rem;
+            margin-bottom: 32px;
+        }
+
+        .showcase-list { list-style: none; }
+
+        .showcase-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            color: var(--gray-700);
+        }
+
+        .showcase-list i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .showcase-visual {
+            background: var(--gradient-soft);
+            border-radius: var(--radius);
+            padding: 40px;
+            border: 1px solid var(--gray-100);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .showcase-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .showcase-mockup {
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .showcase-mockup .bar {
+            height: 8px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .showcase-mockup .bar.w-75 { width: 75%; }
+        .showcase-mockup .bar.w-50 { width: 50%; }
+
+        .showcase-mockup .block-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .showcase-mockup .block {
+            height: 60px;
+            background: var(--gradient-soft);
+            border-radius: 8px;
+            border: 1px solid var(--gray-100);
+        }
+
+        /* ---------- BENEFITS ---------- */
+        .benefits {
+            background: var(--gray-50);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+        }
+
+        .benefit-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px;
+            border: 1px solid var(--gray-100);
+            display: flex;
+            gap: 24px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .benefit-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            opacity: 0.3;
+            line-height: 1;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .benefit-card p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        /* ---------- PORTFOLIO ---------- */
+        .portfolio {
+            background: var(--white);
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .portfolio-item {
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 4/3;
+            background: var(--gradient-soft);
+            border: 1px solid var(--gray-100);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+
+        .portfolio-overlay h3 {
+            color: var(--white);
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .portfolio-overlay p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+        }
+
+        .portfolio-mockup {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary);
+            opacity: 0.3;
+        }
+
+        /* ---------- TESTIMONIALS ---------- */
+        .testimonials {
+            background: var(--gray-50);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            border: 1px solid var(--gray-100);
+            transition: all 0.4s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .testimonial-stars {
+            color: #fbbf24;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+            color: var(--gray-700);
+            margin-bottom: 24px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .author-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .author-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .author-info p {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+        }
+
+        /* ---------- PRICING ---------- */
+        .pricing {
+            background: var(--white);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            align-items: start;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1);
+            transform: scale(1.02);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.04) translateY(-4px);
+        }
+
+        .pricing-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: var(--gradient);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.03em;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--gray-600);
+        }
+
+        .pricing-desc {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        .pricing-features i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .pricing-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            color: var(--dark);
+        }
+
+        .pricing-btn:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .pricing-card.featured .pricing-btn {
+            background: var(--gradient);
+            color: var(--white);
+            border: none;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .pricing-card.featured .pricing-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+        }
+
+        /* ---------- FAQ ---------- */
+        .faq {
+            background: var(--gray-50);
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--gray-200);
+        }
+
+        .faq-question {
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--dark);
+            transition: background 0.2s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--gray-50);
+        }
+
+        .faq-question i {
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s ease;
+            padding: 0 32px;
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding: 0 32px 24px;
+        }
+
+        /* ---------- CTA ---------- */
+        .cta {
+            background: var(--dark);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cta::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            right: -20%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        .cta-form {
+            display: flex;
+            gap: 12px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .cta-form input {
+            flex: 1;
+            padding: 16px 24px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-form input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .cta-form input:focus {
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .cta-form button {
+            background: var(--gradient);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+            white-space: nowrap;
+        }
+
+        .cta-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.5);
+        }
+
+        /* ---------- FOOTER ---------- */
+        .footer {
+            background: var(--dark);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 64px;
+        }
+
+        .footer-brand h3 {
+            color: var(--white);
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-brand h3 i {
+            color: var(--primary);
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        .footer-col h4 {
+            color: var(--white);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.85rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-social a {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-social a:hover {
+            color: var(--white);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 1024px) {
+            .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+            .hero-card { transform: none; }
+            .features-grid,
+            .portfolio-grid,
+            .testimonial-grid,
+            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+            .showcase-grid { grid-template-columns: 1fr; gap: 40px; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .menu-toggle { display: block; }
+            .features-grid,
+            .portfolio-grid,
+            .testimonial-grid,
+            .pricing-grid { grid-template-columns: 1fr; }
+            .pricing-card.featured { transform: none; }
+            .pricing-card.featured:hover { transform: translateY(-4px); }
+            .hero-stats { flex-direction: column; gap: 24px; }
+            .cta-form { flex-direction: column; }
+            .cta-form button { width: 100%; }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+            section { padding: 72px 0; }
+            .hero { padding-top: 140px; }
+            .mesh-canvas { opacity: 0.5; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-actions { flex-direction: column; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+            .logo-grid { gap: 24px; }
+            .logo-grid span { font-size: 1rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+            .hero::after, .features::after, .pricing::after { animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-code"></i> devloperweb.com
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="#features" data-en="Features" data-id="Fitur">Fitur</a></li>
+                <li><a href="#showcase" data-en="Showcase" data-id="Portofolio">Portofolio</a></li>
+                <li><a href="#portfolio" data-en="Portfolio" data-id="Karya">Karya</a></li>
+                <li><a href="#pricing" data-en="Pricing" data-id="Harga">Harga</a></li>
+                <li><a href="#faq" data-en="FAQ" data-id="FAQ">FAQ</a></li>
+            </ul>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="lang-switch" aria-label="Pilih Bahasa">
+                    <span data-lang="en">EN</span>
+                    <span class="active" data-lang="id">ID</span>
+                </div>
+                <a href="https://wa.me/628988627782?text=Halo%20devloperweb.com%2C%20saya%20ingin%20konsultasi%20gratis" target="_blank" rel="noopener" class="nav-cta" id="navCta">Mulai Sekarang</a>
+                <button class="menu-toggle" aria-label="Buka menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+        <canvas class="mesh-canvas bright" data-mesh></canvas>
+
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content reveal">
+                    <div class="hero-badge" id="heroBadge">
+                        <i class="fas fa-bolt"></i> Pengembangan Web Premium
+                    </div>
+                    <h1 id="heroTitle">
+                        Website yang <span class="text-gradient">mengkonversi</span> pengunjung menjadi pelanggan
+                    </h1>
+                    <p id="heroDesc">
+                        Kami membangun website berperforma tinggi yang berfokus pada konversi untuk pemilik bisnis yang menginginkan hasil. 
+                        Kode bersih, desain memukau, pertumbuhan yang terukur.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="https://wa.me/628988627782?text=Halo%20devloperweb.com%2C%20saya%20ingin%20konsultasi%20gratis" target="_blank" rel="noopener" class="btn-primary" id="heroBtnPrimary">
+                            Konsultasi Gratis <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a href="#showcase" class="btn-secondary" id="heroBtnSecondary">
+                            Lihat Karya Kami
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <h3>150+</h3>
+                            <p id="stat1">Proyek Selesai</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>98%</h3>
+                            <p id="stat2">Kepuasan Klien</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>3.2x</h3>
+                            <p id="stat3">Rata-rata Kenaikan Konversi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual reveal reveal-delay-2">
+                    <div class="hero-card">
+                        <div class="mockup-header">
+                            <div class="mockup-dot"></div>
+                            <div class="mockup-dot"></div>
+                            <div class="mockup-dot"></div>
+                        </div>
+                        <div class="mockup-line"></div>
+                        <div class="mockup-line short"></div>
+                        <div class="mockup-line"></div>
+                        <div class="mockup-grid">
+                            <div class="mockup-block"></div>
+                            <div class="mockup-block"></div>
+                            <div class="mockup-block"></div>
+                            <div class="mockup-block"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SOCIAL PROOF ========== -->
+    <section class="social-proof">
+        <div class="container reveal">
+            <p id="socialProofText">Dipercaya oleh bisnis-bisnis visioner</p>
+            <div class="logo-grid">
+                <span>ACME Corp</span>
+                <span>Nexus</span>
+                <span>Vertex</span>
+                <span>Stellar</span>
+                <span>Pinnacle</span>
+                <span>Horizon</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FEATURES ========== -->
+    <section class="features" id="features">
+        <canvas class="mesh-canvas" data-mesh></canvas>
+
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 id="featuresTitle">Semua yang Anda butuhkan untuk <span class="text-gradient">sukses online</span></h2>
+                <p id="featuresDesc">Kami menggabungkan strategi, desain, dan rekayasa untuk menciptakan website yang berkinerja tinggi.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card reveal reveal-delay-1">
+                    <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+                    <h3 id="feature1Title">Sangat Cepat</h3>
+                    <p id="feature1Desc">Dioptimalkan untuk kecepatan dengan skor Lighthouse 90+. Pengunjung Anda mendapatkan pemuatan instan, setiap saat.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-2">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 id="feature2Title">Berfokus pada Konversi</h3>
+                    <p id="feature2Desc">Setiap elemen dirancang dengan satu tujuan: mengubah pengunjung Anda menjadi pelanggan yang membayar.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3 id="feature3Title">Mobile First</h3>
+                    <p id="feature3Desc">Pengalaman sempurna di setiap perangkat. Lebih dari 60% lalu lintas Anda adalah mobile — kami membuatnya berarti.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-1">
+                    <div class="feature-icon"><i class="fas fa-search"></i></div>
+                    <h3 id="feature4Title">Siap SEO</h3>
+                    <p id="feature4Desc">Dibangun dengan praktik terbaik, HTML semantik, dan performa super cepat untuk peringkat teratas.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-2">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3 id="feature5Title">Aman & Andal</h3>
+                    <p id="feature5Desc">Keamanan tingkat enterprise, SSL, dan uptime 99,9% sehingga bisnis Anda tidak pernah offline.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <h3 id="feature6Title">Dukungan Khusus</h3>
+                    <p id="feature6Desc">Tim manusia nyata siap membantu. Kami bersama Anda jauh setelah peluncuran untuk memastikan kesuksesan Anda.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SHOWCASE ========== -->
+    <section class="showcase" id="showcase">
+        <div class="container">
+            <div class="showcase-grid">
+                <div class="showcase-content reveal">
+                    <h2 id="showcaseTitle">Dibangun dengan <span class="text-gradient">presisi</span> dan tujuan</h2>
+                    <p id="showcaseDesc">
+                        Kami tidak hanya membangun website — kami menciptakan pengalaman digital yang selaras dengan tujuan bisnis Anda. 
+                        Setiap piksel, setiap interaksi dirancang untuk memberikan hasil.
+                    </p>
+                    <ul class="showcase-list">
+                        <li><i class="fas fa-check-circle"></i> <span id="showcaseList1">Desain khusus yang disesuaikan dengan merek Anda</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="showcaseList2">Optimasi performa super cepat</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="showcaseList3">Tata letak & CTA yang berfokus pada konversi</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="showcaseList4">Kode bersih & praktik terbaik</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="showcaseList5">Dukungan & pemeliharaan berkelanjutan</span></li>
+                    </ul>
+                </div>
+                <div class="showcase-visual reveal reveal-delay-2">
+                    <div class="showcase-mockup">
+                        <div class="bar w-75"></div>
+                        <div class="bar w-50"></div>
+                        <div class="bar"></div>
+                        <div class="block-grid">
+                            <div class="block"></div>
+                            <div class="block"></div>
+                            <div class="block"></div>
+                            <div class="block"></div>
+                            <div class="block"></div>
+                            <div class="block"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== BENEFITS ========== -->
+    <section class="benefits">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 id="benefitsTitle">Mengapa pemilik bisnis <span class="text-gradient">memilih kami</span></h2>
+                <p id="benefitsDesc">Kami bukan sekadar agensi web biasa. Kami adalah mitra pertumbuhan Anda.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card reveal reveal-delay-1">
+                    <div class="benefit-number">01</div>
+                    <div>
+                        <h3 id="benefit1Title">Pendekatan Berorientasi Hasil</h3>
+                        <p id="benefit1Desc">Kami mengukur kesuksesan berdasarkan metrik bisnis Anda — prospek, penjualan, dan ROI. Bukan sekadar desain yang cantik.</p>
+                    </div>
+                </div>
+                <div class="benefit-card reveal reveal-delay-2">
+                    <div class="benefit-number">02</div>
+                    <div>
+                        <h3 id="benefit2Title">Komunikasi Transparan</h3>
+                        <p id="benefit2Desc">Tanpa jargon, tanpa kejutan. Anda akan selalu tahu persis di mana proyek Anda berada.</p>
+                    </div>
+                </div>
+                <div class="benefit-card reveal reveal-delay-3">
+                    <div class="benefit-number">03</div>
+                    <div>
+                        <h3 id="benefit3Title">Pengerjaan Cepat</h3>
+                        <p id="benefit3Desc">Kami menghargai waktu Anda. Sebagian besar proyek diselesaikan dalam 2–4 minggu tanpa mengorbankan kualitas.</p>
+                    </div>
+                </div>
+                <div class="benefit-card reveal reveal-delay-4">
+                    <div class="benefit-number">04</div>
+                    <div>
+                        <h3 id="benefit4Title">Kemitraan Jangka Panjang</h3>
+                        <p id="benefit4Desc">Kami di sini untuk jangka panjang. Saat bisnis Anda tumbuh, kami tumbuh bersama Anda.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PORTFOLIO ========== -->
+    <section class="portfolio" id="portfolio">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 id="portfolioTitle">Karya <span class="text-gradient">terbaru</span></h2>
+                <p id="portfolioDesc">Proyek nyata, hasil nyata. Lihat bagaimana kami membantu bisnis seperti milik Anda.</p>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item reveal reveal-delay-1">
+                    <div class="portfolio-mockup"><i class="fas fa-laptop-code"></i></div>
+                    <div class="portfolio-overlay">
+                        <h3 id="portfolio1Title">Platform E-Commerce</h3>
+                        <p id="portfolio1Desc">+240% pertumbuhan pendapatan</p>
+                    </div>
+                </div>
+                <div class="portfolio-item reveal reveal-delay-2">
+                    <div class="portfolio-mockup"><i class="fas fa-chart-pie"></i></div>
+                    <div class="portfolio-overlay">
+                        <h3 id="portfolio2Title">Dashboard SaaS</h3>
+                        <p id="portfolio2Desc">+180% retensi pengguna</p>
+                    </div>
+                </div>
+                <div class="portfolio-item reveal reveal-delay-3">
+                    <div class="portfolio-mockup"><i class="fas fa-building"></i></div>
+                    <div class="portfolio-overlay">
+                        <h3 id="portfolio3Title">Website Perusahaan</h3>
+                        <p id="portfolio3Desc">+320% prospek berkualitas</p>
+                    </div>
+                </div>
+                <div class="portfolio-item reveal reveal-delay-1">
+                    <div class="portfolio-mockup"><i class="fas fa-store"></i></div>
+                    <div class="portfolio-overlay">
+                        <h3 id="portfolio4Title">Bisnis Lokal</h3>
+                        <p id="portfolio4Desc">+150% kunjungan fisik</p>
+                    </div>
+                </div>
+                <div class="portfolio-item reveal reveal-delay-2">
+                    <div class="portfolio-mockup"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="portfolio-overlay">
+                        <h3 id="portfolio5Title">Platform Kursus Online</h3>
+                        <p id="portfolio5Desc">+400% pendaftaran</p>
+                    </div>
+                </div>
+                <div class="portfolio-item reveal reveal-delay-3">
+                    <div class="portfolio-mockup"><i class="fas fa-heartbeat"></i></div>
+                    <div class="portfolio-overlay">
+                        <h3 id="portfolio6Title">Portal Kesehatan</h3>
+                        <p id="portfolio6Desc">+210% keterlibatan pasien</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TESTIMONIALS ========== -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 id="testimonialsTitle">Apa kata <span class="text-gradient">klien kami</span></h2>
+                <p id="testimonialsDesc">Jangan hanya percaya kata kami — dengarkan dari pemilik bisnis yang telah kami bantu tumbuh.</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card reveal reveal-delay-1">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text" id="testimonial1Text">
+                        "devloperweb.com mengubah kehadiran online kami sepenuhnya. Prospek kami meningkat 320% dalam 3 bulan pertama. Sangat direkomendasikan!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">BS</div>
+                        <div class="author-info">
+                            <h4>Budi Santoso</h4>
+                            <p id="testimonial1Role">CEO, Santoso Retail</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal reveal-delay-2">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text" id="testimonial2Text">
+                        "Tim langsung memahami visi kami. Website yang mereka bangun tidak hanya indah tetapi juga sangat cepat. Tingkat konversi kami berlipat ganda."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SW</div>
+                        <div class="author-info">
+                            <h4>Siti Wijaya</h4>
+                            <p id="testimonial2Role">Founder, Wijaya Beauty</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal reveal-delay-3">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text" id="testimonial3Text">
+                        "Profesional, responsif, dan berorientasi hasil. devloperweb.com adalah satu-satunya agensi yang saya percayai untuk proyek web saya. Lima bintang!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AP</div>
+                        <div class="author-info">
+                            <h4>Andi Pratama</h4>
+                            <p id="testimonial3Role">Direktur, Pratama Logistics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PRICING ========== -->
+    <section class="pricing" id="pricing">
+        <canvas class="mesh-canvas" data-mesh></canvas>
+
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 id="pricingTitle">Harga <span class="text-gradient">sederhana & transparan</span></h2>
+                <p id="pricingDesc">Pilih paket yang sempurna untuk bisnis Anda. Tanpa biaya tersembunyi.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card reveal reveal-delay-1">
+                    <h3 id="pricing1Name">Starter</h3>
+                    <div class="pricing-price">Rp 800rb<span id="pricing1Period">/proyek</span></div>
+                    <p class="pricing-desc" id="pricing1Desc">Sempurna untuk bisnis kecil yang baru memulai online.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> <span id="pricing1Feat1">Website kustom 5 halaman</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing1Feat2">Desain responsif mobile</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing1Feat3">Setup SEO dasar</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing1Feat4">Integrasi formulir kontak</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing1Feat5">2 putaran revisi</span></li>
+                    </ul>
+                    <button class="pricing-btn" id="pricing1Btn" onclick="window.open('https://wa.me/628988627782?text=Halo%20devloperweb.com%2C%20saya%20tertarik%20dengan%20paket%20Starter%20(Rp%20800rb)', '_blank')">Mulai Sekarang</button>
+                </div>
+
+                <div class="pricing-card featured reveal reveal-delay-2">
+                    <div class="pricing-badge" id="pricingBadge">Paling Populer</div>
+                    <h3 id="pricing2Name">Professional</h3>
+                    <div class="pricing-price">Rp 3,5 Jt<span id="pricing2Period">/proyek</span></div>
+                    <p class="pricing-desc" id="pricing2Desc">Ideal untuk bisnis berkembang yang membutuhkan lebih banyak kekuatan.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> <span id="pricing2Feat1">Website kustom 10 halaman</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing2Feat2">Desain responsif lanjutan</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing2Feat3">Optimasi SEO lengkap</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing2Feat4">Integrasi CMS</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing2Feat5">Setup analitik</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing2Feat6">4 putaran revisi</span></li>
+                    </ul>
+                    <button class="pricing-btn" id="pricing2Btn" onclick="window.open('https://wa.me/628988627782?text=Halo%20devloperweb.com%2C%20saya%20tertarik%20dengan%20paket%20Professional%20(Rp%203%2C5%20Jt)', '_blank')">Mulai Sekarang</button>
+                </div>
+
+                <div class="pricing-card reveal reveal-delay-3">
+                    <h3 id="pricing3Name">Enterprise</h3>
+                    <div class="pricing-price">Rp 6 Jt<span id="pricing3Period">/proyek</span></div>
+                    <p class="pricing-desc" id="pricing3Desc">Untuk bisnis yang menuntut yang terbaik.</p>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> <span id="pricing3Feat1">Halaman tak terbatas</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing3Feat2">Desain kustom premium</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing3Feat3">SEO & pemasaran lanjutan</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing3Feat4">Integrasi e-commerce</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing3Feat5">Dukungan prioritas</span></li>
+                        <li><i class="fas fa-check"></i> <span id="pricing3Feat6">Revisi tak terbatas</span></li>
+                    </ul>
+                    <button class="pricing-btn" id="pricing3Btn" onclick="window.open('https://wa.me/628988627782?text=Halo%20devloperweb.com%2C%20saya%20tertarik%20dengan%20paket%20Enterprise%20(Rp%206%20Jt)', '_blank')">Mulai Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FAQ ========== -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2 id="faqTitle">Pertanyaan yang <span class="text-gradient">sering diajukan</span></h2>
+                <p id="faqDesc">Semua yang perlu Anda ketahui sebelum bekerja dengan kami.</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item reveal reveal-delay-1">
+                    <div class="faq-question">
+                        <span id="faq1Q">Berapa lama waktu yang dibutuhkan untuk membangun website?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer" id="faq1A">
+                        Sebagian besar proyek diselesaikan dalam 2–4 minggu, tergantung pada kompleksitasnya. Kami akan memberikan jadwal terperinci setelah konsultasi awal kami.
+                    </div>
+                </div>
+                <div class="faq-item reveal reveal-delay-2">
+                    <div class="faq-question">
+                        <span id="faq2Q">Apakah Anda menawarkan pemeliharaan berkelanjutan?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer" id="faq2A">
+                        Ya! Kami menawarkan paket pemeliharaan bulanan yang mencakup pembaruan, pemantauan keamanan, pencadangan, dan dukungan prioritas.
+                    </div>
+                </div>
+                <div class="faq-item reveal reveal-delay-3">
+                    <div class="faq-question">
+                        <span id="faq3Q">Bisakah saya memperbarui website sendiri?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer" id="faq3A">
+                        Tentu saja. Kami mengintegrasikan platform CMS yang ramah pengguna sehingga Anda dapat dengan mudah memperbarui konten tanpa pengetahuan teknis.
+                    </div>
+                </div>
+                <div class="faq-item reveal reveal-delay-4">
+                    <div class="faq-question">
+                        <span id="faq4Q">Bagaimana jika saya tidak puas dengan desainnya?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer" id="faq4A">
+                        Kami menyertakan beberapa putaran revisi di setiap paket. Kepuasan Anda adalah prioritas kami — kami akan bekerja sampai Anda menyukainya.
+                    </div>
+                </div>
+                <div class="faq-item reveal reveal-delay-5">
+                    <div class="faq-question">
+                        <span id="faq5Q">Apakah Anda menyediakan layanan hosting dan domain?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer" id="faq5A">
+                        Ya, kami dapat menangani semuanya — pendaftaran domain, pengaturan hosting, dan sertifikat SSL. Atau kami dapat bekerja dengan penyedia yang sudah Anda gunakan.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CTA ========== -->
+    <section class="cta" id="cta">
+        <div class="container">
+            <div class="cta-content reveal">
+                <h2 id="ctaTitle">Siap mengembangkan bisnis Anda?</h2>
+                <p id="ctaDesc">Dapatkan konsultasi gratis dan lihat bagaimana kami dapat membantu Anda mencapai tujuan.</p>
+                <form class="cta-form" onsubmit="event.preventDefault(); kirimWhatsApp();">
+                    <input type="text" placeholder="Masukkan nama & pesan Anda" required aria-label="Nama dan pesan" id="ctaInput">
+                    <button type="submit" id="ctaBtn">Kirim via WhatsApp <i class="fab fa-whatsapp"></i></button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3><i class="fas fa-code"></i> devloperweb.com</h3>
+                    <p id="footerDesc">
+                        Pengembangan web premium untuk pemilik bisnis yang menginginkan hasil. 
+                        Kami membangun website yang mengkonversi.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4 id="footerServices">Layanan</h4>
+                    <a href="#" id="footerService1">Pengembangan Web</a>
+                    <a href="#" id="footerService2">Desain UI/UX</a>
+                    <a href="#" id="footerService3">Optimasi SEO</a>
+                    <a href="#" id="footerService4">Pemeliharaan</a>
+                </div>
+                <div class="footer-col">
+                    <h4 id="footerCompany">Perusahaan</h4>
+                    <a href="#" id="footerCompany1">Tentang Kami</a>
+                    <a href="#" id="footerCompany2">Portofolio</a>
+                    <a href="#" id="footerCompany3">Blog</a>
+                    <a href="#" id="footerCompany4">Karier</a>
+                </div>
+                <div class="footer-col">
+                    <h4 id="footerSupport">Dukungan</h4>
+                    <a href="#" id="footerSupport1">Kontak</a>
+                    <a href="#" id="footerSupport2">FAQ</a>
+                    <a href="#" id="footerSupport3">Kebijakan Privasi</a>
+                    <a href="#" id="footerSupport4">Syarat & Ketentuan</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p id="footerCopyright">&copy; 2025 devloperweb.com. Hak cipta dilindungi.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        (function() {
+            'use strict';
+
+            /* ============================================================
+               DYNAMIC MESH NETWORK ANIMATION
+               Jaringan node bergerak yang saling terhubung secara dinamis
+               ============================================================ */
+            function initMeshNetwork() {
+                const canvases = document.querySelectorAll('[data-mesh]');
+
+                canvases.forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    const section = canvas.parentElement;
+                    let width, height, dpr;
+                    let nodes = [];
+                    let animationId;
+                    let isVisible = true;
+
+                    // Konfigurasi
+                    const CONFIG = {
+                        nodeCount: 55,           // jumlah node
+                        maxDistance: 160,        // jarak maksimal antar node untuk terhubung
+                        nodeRadius: 2,           // radius node
+                        nodeSpeed: 0.35,         // kecepatan gerak node
+                        lineWidth: 1,            // ketebalan garis
+                        nodeColor: '37, 99, 235', // primary blue RGB
+                        nodeColor2: '124, 58, 237', // accent purple RGB
+                        lineAlpha: 0.35,         // opacity garis maksimum
+                        nodeAlpha: 0.75          // opacity node maksimum
+                    };
+
+                    // Resize canvas dengan DPR
+                    function resize() {
+                        dpr = Math.min(window.devicePixelRatio || 1, 2);
+                        width = section.clientWidth;
+                        height = section.clientHeight;
+                        canvas.width = width * dpr;
+                        canvas.height = height * dpr;
+                        canvas.style.width = width + 'px';
+                        canvas.style.height = height + 'px';
+                        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    }
+
+                    // Buat node
+                    function createNodes() {
+                        nodes = [];
+                        const count = width < 768 ? Math.floor(CONFIG.nodeCount * 0.6) : CONFIG.nodeCount;
+                        for (let i = 0; i < count; i++) {
+                            const isAccent = Math.random() > 0.6;
+                            nodes.push({
+                                x: Math.random() * width,
+                                y: Math.random() * height,
+                                vx: (Math.random() - 0.5) * CONFIG.nodeSpeed * 2,
+                                vy: (Math.random() - 0.5) * CONFIG.nodeSpeed * 2,
+                                radius: CONFIG.nodeRadius + Math.random() * 1.5,
+                                color: isAccent ? CONFIG.nodeColor2 : CONFIG.nodeColor,
+                                pulse: Math.random() * Math.PI * 2,
+                                pulseSpeed: 0.02 + Math.random() * 0.03
+                            });
+                        }
+                    }
+
+                    // Update posisi node
+                    function updateNodes() {
+                        for (let n of nodes) {
+                            n.x += n.vx;
+                            n.y += n.vy;
+                            n.pulse += n.pulseSpeed;
+
+                            // Bounce di tepi
+                            if (n.x < 0 || n.x > width) n.vx *= -1;
+                            if (n.y < 0 || n.y > height) n.vy *= -1;
+
+                            // Clamp
+                            n.x = Math.max(0, Math.min(width, n.x));
+                            n.y = Math.max(0, Math.min(height, n.y));
+                        }
+                    }
+
+                    // Gambar koneksi antar node
+                    function drawConnections() {
+                        for (let i = 0; i < nodes.length; i++) {
+                            for (let j = i + 1; j < nodes.length; j++) {
+                                const a = nodes[i], b = nodes[j];
+                                const dx = a.x - b.x;
+                                const dy = a.y - b.y;
+                                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                                if (dist < CONFIG.maxDistance) {
+                                    const alpha = (1 - dist / CONFIG.maxDistance) * CONFIG.lineAlpha;
+
+                                    // Gradient line antara dua warna node
+                                    const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+                                    grad.addColorStop(0, `rgba(${a.color}, ${alpha})`);
+                                    grad.addColorStop(1, `rgba(${b.color}, ${alpha})`);
+
+                                    ctx.strokeStyle = grad;
+                                    ctx.lineWidth = CONFIG.lineWidth;
+                                    ctx.beginPath();
+                                    ctx.moveTo(a.x, a.y);
+                                    ctx.lineTo(b.x, b.y);
+                                    ctx.stroke();
+                                }
+                            }
+                        }
+                    }
+
+                    // Gambar node
+                    function drawNodes() {
+                        for (let n of nodes) {
+                            const pulseScale = 1 + Math.sin(n.pulse) * 0.35;
+                            const alpha = CONFIG.nodeAlpha * (0.7 + Math.sin(n.pulse) * 0.3);
+
+                            // Glow
+                            const glowGrad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 6);
+                            glowGrad.addColorStop(0, `rgba(${n.color}, ${alpha * 0.6})`);
+                            glowGrad.addColorStop(1, `rgba(${n.color}, 0)`);
+                            ctx.fillStyle = glowGrad;
+                            ctx.beginPath();
+                            ctx.arc(n.x, n.y, n.radius * 6, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            // Node inti
+                            ctx.fillStyle = `rgba(${n.color}, ${alpha})`;
+                            ctx.beginPath();
+                            ctx.arc(n.x, n.y, n.radius * pulseScale, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+
+                    // Loop animasi
+                    function animate() {
+                        if (!isVisible) return;
+                        ctx.clearRect(0, 0, width, height);
+                        updateNodes();
+                        drawConnections();
+                        drawNodes();
+                        animationId = requestAnimationFrame(animate);
+                    }
+
+                    // Start / stop berdasarkan visibility
+                    function start() {
+                        if (!isVisible) {
+                            isVisible = true;
+                            animate();
+                        }
+                    }
+                    function stop() {
+                        isVisible = false;
+                        if (animationId) cancelAnimationFrame(animationId);
+                    }
+
+                    // Init
+                    resize();
+                    createNodes();
+                    animate();
+
+                    // Handle resize (debounce)
+                    let resizeTimer;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimer);
+                        resizeTimer = setTimeout(() => {
+                            resize();
+                            createNodes();
+                        }, 200);
+                    });
+
+                    // Pause ketika tidak terlihat (performance)
+                    const sectionObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                start();
+                            } else {
+                                stop();
+                            }
+                        });
+                    }, { threshold: 0.01 });
+                    sectionObserver.observe(section);
+
+                    // Pause saat tab tidak aktif
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.hidden) {
+                            stop();
+                        } else {
+                            start();
+                        }
+                    });
+                });
+            }
+
+            // Init setelah DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMeshNetwork);
+            } else {
+                initMeshNetwork();
+            }
+
+            // ---------- WHATSAPP HELPER ----------
+            const WA_NUMBER = '628988627782';
+
+            function kirimWhatsApp() {
+                const input = document.getElementById('ctaInput');
+                const pesan = input.value.trim() || 'Halo devloperweb.com, saya ingin konsultasi gratis';
+                const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`;
+                window.open(url, '_blank');
+                input.value = '';
+            }
+            window.kirimWhatsApp = kirimWhatsApp;
+
+            // ---------- NAVBAR SCROLL EFFECT ----------
+            const navbar = document.getElementById('navbar');
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }, { passive: true });
+
+            // ---------- SCROLL REVEAL ----------
+            const revealElements = document.querySelectorAll('.reveal');
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+
+            // ---------- FAQ ACCORDION ----------
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    faqItems.forEach(other => other.classList.remove('active'));
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // ---------- BILINGUAL NAV (EN/ID) ----------
+            const langSpans = document.querySelectorAll('.lang-switch span');
+
+            const translations = {
+                id: {
+                    navFeatures: 'Fitur', navShowcase: 'Portofolio', navPortfolio: 'Karya',
+                    navPricing: 'Harga', navFaq: 'FAQ', navCta: 'Mulai Sekarang',
+                    heroBadge: '<i class="fas fa-bolt"></i> Pengembangan Web Premium',
+                    heroTitle: 'Website yang <span class="text-gradient">mengkonversi</span> pengunjung menjadi pelanggan',
+                    heroDesc: 'Kami membangun website berperforma tinggi yang berfokus pada konversi untuk pemilik bisnis yang menginginkan hasil. Kode bersih, desain memukau, pertumbuhan yang terukur.',
+                    heroBtnPrimary: 'Konsultasi Gratis <i class="fas fa-arrow-right"></i>',
+                    heroBtnSecondary: 'Lihat Karya Kami',
+                    stat1: 'Proyek Selesai', stat2: 'Kepuasan Klien', stat3: 'Rata-rata Kenaikan Konversi',
+                    socialProofText: 'Dipercaya oleh bisnis-bisnis visioner',
+                    featuresTitle: 'Semua yang Anda butuhkan untuk <span class="text-gradient">sukses online</span>',
+                    featuresDesc: 'Kami menggabungkan strategi, desain, dan rekayasa untuk menciptakan website yang berkinerja tinggi.',
+                    feature1Title: 'Sangat Cepat', feature1Desc: 'Dioptimalkan untuk kecepatan dengan skor Lighthouse 90+. Pengunjung Anda mendapatkan pemuatan instan, setiap saat.',
+                    feature2Title: 'Berfokus pada Konversi', feature2Desc: 'Setiap elemen dirancang dengan satu tujuan: mengubah pengunjung Anda menjadi pelanggan yang membayar.',
+                    feature3Title: 'Mobile First', feature3Desc: 'Pengalaman sempurna di setiap perangkat. Lebih dari 60% lalu lintas Anda adalah mobile — kami membuatnya berarti.',
+                    feature4Title: 'Siap SEO', feature4Desc: 'Dibangun dengan praktik terbaik, HTML semantik, dan performa super cepat untuk peringkat teratas.',
+                    feature5Title: 'Aman & Andal', feature5Desc: 'Keamanan tingkat enterprise, SSL, dan uptime 99,9% sehingga bisnis Anda tidak pernah offline.',
+                    feature6Title: 'Dukungan Khusus', feature6Desc: 'Tim manusia nyata siap membantu. Kami bersama Anda jauh setelah peluncuran untuk memastikan kesuksesan Anda.',
+                    showcaseTitle: 'Dibangun dengan <span class="text-gradient">presisi</span> dan tujuan',
+                    showcaseDesc: 'Kami tidak hanya membangun website — kami menciptakan pengalaman digital yang selaras dengan tujuan bisnis Anda. Setiap piksel, setiap interaksi dirancang untuk memberikan hasil.',
+                    showcaseList1: 'Desain khusus yang disesuaikan dengan merek Anda',
+                    showcaseList2: 'Optimasi performa super cepat',
+                    showcaseList3: 'Tata letak & CTA yang berfokus pada konversi',
+                    showcaseList4: 'Kode bersih & praktik terbaik',
+                    showcaseList5: 'Dukungan & pemeliharaan berkelanjutan',
+                    benefitsTitle: 'Mengapa pemilik bisnis <span class="text-gradient">memilih kami</span>',
+                    benefitsDesc: 'Kami bukan sekadar agensi web biasa. Kami adalah mitra pertumbuhan Anda.',
+                    benefit1Title: 'Pendekatan Berorientasi Hasil', benefit1Desc: 'Kami mengukur kesuksesan berdasarkan metrik bisnis Anda — prospek, penjualan, dan ROI. Bukan sekadar desain yang cantik.',
+                    benefit2Title: 'Komunikasi Transparan', benefit2Desc: 'Tanpa jargon, tanpa kejutan. Anda akan selalu tahu persis di mana proyek Anda berada.',
+                    benefit3Title: 'Pengerjaan Cepat', benefit3Desc: 'Kami menghargai waktu Anda. Sebagian besar proyek diselesaikan dalam 2–4 minggu tanpa mengorbankan kualitas.',
+                    benefit4Title: 'Kemitraan Jangka Panjang', benefit4Desc: 'Kami di sini untuk jangka panjang. Saat bisnis Anda tumbuh, kami tumbuh bersama Anda.',
+                    portfolioTitle: 'Karya <span class="text-gradient">terbaru</span>',
+                    portfolioDesc: 'Proyek nyata, hasil nyata. Lihat bagaimana kami membantu bisnis seperti milik Anda.',
+                    portfolio1Title: 'Platform E-Commerce', portfolio1Desc: '+240% pertumbuhan pendapatan',
+                    portfolio2Title: 'Dashboard SaaS', portfolio2Desc: '+180% retensi pengguna',
+                    portfolio3Title: 'Website Perusahaan', portfolio3Desc: '+320% prospek berkualitas',
+                    portfolio4Title: 'Bisnis Lokal', portfolio4Desc: '+150% kunjungan fisik',
+                    portfolio5Title: 'Platform Kursus Online', portfolio5Desc: '+400% pendaftaran',
+                    portfolio6Title: 'Portal Kesehatan', portfolio6Desc: '+210% keterlibatan pasien',
+                    testimonialsTitle: 'Apa kata <span class="text-gradient">klien kami</span>',
+                    testimonialsDesc: 'Jangan hanya percaya kata kami — dengarkan dari pemilik bisnis yang telah kami bantu tumbuh.',
+                    testimonial1Text: '"devloperweb.com mengubah kehadiran online kami sepenuhnya. Prospek kami meningkat 320% dalam 3 bulan pertama. Sangat direkomendasikan!"',
+                    testimonial1Role: 'CEO, Santoso Retail',
+                    testimonial2Text: '"Tim langsung memahami visi kami. Website yang mereka bangun tidak hanya indah tetapi juga sangat cepat. Tingkat konversi kami berlipat ganda."',
+                    testimonial2Role: 'Founder, Wijaya Beauty',
+                    testimonial3Text: '"Profesional, responsif, dan berorientasi hasil. devloperweb.com adalah satu-satunya agensi yang saya percayai untuk proyek web saya. Lima bintang!"',
+                    testimonial3Role: 'Direktur, Pratama Logistics',
+                    pricingTitle: 'Harga <span class="text-gradient">sederhana & transparan</span>',
+                    pricingDesc: 'Pilih paket yang sempurna untuk bisnis Anda. Tanpa biaya tersembunyi.',
+                    pricing1Name: 'Starter', pricing1Period: '/proyek', pricing1Desc: 'Sempurna untuk bisnis kecil yang baru memulai online.',
+                    pricing1Feat1: 'Website kustom 5 halaman', pricing1Feat2: 'Desain responsif mobile', pricing1Feat3: 'Setup SEO dasar',
+                    pricing1Feat4: 'Integrasi formulir kontak', pricing1Feat5: '2 putaran revisi', pricing1Btn: 'Mulai Sekarang',
+                    pricingBadge: 'Paling Populer',
+                    pricing2Name: 'Professional', pricing2Period: '/proyek', pricing2Desc: 'Ideal untuk bisnis berkembang yang membutuhkan lebih banyak kekuatan.',
+                    pricing2Feat1: 'Website kustom 10 halaman', pricing2Feat2: 'Desain responsif lanjutan', pricing2Feat3: 'Optimasi SEO lengkap',
+                    pricing2Feat4: 'Integrasi CMS', pricing2Feat5: 'Setup analitik', pricing2Feat6: '4 putaran revisi', pricing2Btn: 'Mulai Sekarang',
+                    pricing3Name: 'Enterprise', pricing3Period: '/proyek', pricing3Desc: 'Untuk bisnis yang menuntut yang terbaik.',
+                    pricing3Feat1: 'Halaman tak terbatas', pricing3Feat2: 'Desain kustom premium', pricing3Feat3: 'SEO & pemasaran lanjutan',
+                    pricing3Feat4: 'Integrasi e-commerce', pricing3Feat5: 'Dukungan prioritas', pricing3Feat6: 'Revisi tak terbatas', pricing3Btn: 'Mulai Sekarang',
+                    faqTitle: 'Pertanyaan yang <span class="text-gradient">sering diajukan</span>',
+                    faqDesc: 'Semua yang perlu Anda ketahui sebelum bekerja dengan kami.',
+                    faq1Q: 'Berapa lama waktu yang dibutuhkan untuk membangun website?',
+                    faq1A: 'Sebagian besar proyek diselesaikan dalam 2–4 minggu, tergantung pada kompleksitasnya. Kami akan memberikan jadwal terperinci setelah konsultasi awal kami.',
+                    faq2Q: 'Apakah Anda menawarkan pemeliharaan berkelanjutan?',
+                    faq2A: 'Ya! Kami menawarkan paket pemeliharaan bulanan yang mencakup pembaruan, pemantauan keamanan, pencadangan, dan dukungan prioritas.',
+                    faq3Q: 'Bisakah saya memperbarui website sendiri?',
+                    faq3A: 'Tentu saja. Kami mengintegrasikan platform CMS yang ramah pengguna sehingga Anda dapat dengan mudah memperbarui konten tanpa pengetahuan teknis.',
+                    faq4Q: 'Bagaimana jika saya tidak puas dengan desainnya?',
+                    faq4A: 'Kami menyertakan beberapa putaran revisi di setiap paket. Kepuasan Anda adalah prioritas kami — kami akan bekerja sampai Anda menyukainya.',
+                    faq5Q: 'Apakah Anda menyediakan layanan hosting dan domain?',
+                    faq5A: 'Ya, kami dapat menangani semuanya — pendaftaran domain, pengaturan hosting, dan sertifikat SSL. Atau kami dapat bekerja dengan penyedia yang sudah Anda gunakan.',
+                    ctaTitle: 'Siap mengembangkan bisnis Anda?',
+                    ctaDesc: 'Dapatkan konsultasi gratis dan lihat bagaimana kami dapat membantu Anda mencapai tujuan.',
+                    ctaBtn: 'Kirim via WhatsApp <i class="fab fa-whatsapp"></i>',
+                    ctaInput: 'Masukkan nama & pesan Anda',
+                    footerDesc: 'Pengembangan web premium untuk pemilik bisnis yang menginginkan hasil. Kami membangun website yang mengkonversi.',
+                    footerServices: 'Layanan', footerService1: 'Pengembangan Web', footerService2: 'Desain UI/UX',
+                    footerService3: 'Optimasi SEO', footerService4: 'Pemeliharaan',
+                    footerCompany: 'Perusahaan', footerCompany1: 'Tentang Kami', footerCompany2: 'Portofolio',
+                    footerCompany3: 'Blog', footerCompany4: 'Karier',
+                    footerSupport: 'Dukungan', footerSupport1: 'Kontak', footerSupport2: 'FAQ',
+                    footerSupport3: 'Kebijakan Privasi', footerSupport4: 'Syarat & Ketentuan',
+                    footerCopyright: '&copy; 2025 devloperweb.com. Hak cipta dilindungi.'
+                },
+                en: {
+                    navFeatures: 'Features', navShowcase: 'Showcase', navPortfolio: 'Portfolio',
+                    navPricing: 'Pricing', navFaq: 'FAQ', navCta: 'Get Started',
+                    heroBadge: '<i class="fas fa-bolt"></i> Premium Web Development',
+                    heroTitle: 'Websites that <span class="text-gradient">convert</span> visitors into customers',
+                    heroDesc: 'We build high-performance, conversion-focused websites for business owners who demand results. Clean code, stunning design, measurable growth.',
+                    heroBtnPrimary: 'Get a Free Consultation <i class="fas fa-arrow-right"></i>',
+                    heroBtnSecondary: 'See Our Work',
+                    stat1: 'Projects Delivered', stat2: 'Client Satisfaction', stat3: 'Avg. Conversion Lift',
+                    socialProofText: 'Trusted by forward-thinking businesses',
+                    featuresTitle: 'Everything you need to <span class="text-gradient">succeed online</span>',
+                    featuresDesc: 'We combine strategy, design, and engineering to create websites that perform.',
+                    feature1Title: 'Lightning Fast', feature1Desc: 'Optimized for speed with 90+ Lighthouse scores. Your visitors get instant loading, every time.',
+                    feature2Title: 'Conversion Focused', feature2Desc: 'Every element is designed with one goal: turning your visitors into paying customers.',
+                    feature3Title: 'Mobile First', feature3Desc: 'Flawless experiences on every device. Over 60% of your traffic is mobile — we make it count.',
+                    feature4Title: 'SEO Ready', feature4Desc: 'Built with best practices, semantic HTML, and lightning-fast performance for top rankings.',
+                    feature5Title: 'Secure & Reliable', feature5Desc: 'Enterprise-grade security, SSL, and 99.9% uptime so your business never goes offline.',
+                    feature6Title: 'Dedicated Support', feature6Desc: 'Real humans ready to help. We\'re with you long after launch to ensure your success.',
+                    showcaseTitle: 'Built with <span class="text-gradient">precision</span> and purpose',
+                    showcaseDesc: 'We don\'t just build websites — we craft digital experiences that align with your business goals. Every pixel, every interaction is designed to drive results.',
+                    showcaseList1: 'Custom design tailored to your brand',
+                    showcaseList2: 'Lightning-fast performance optimizations',
+                    showcaseList3: 'Conversion-focused layouts & CTAs',
+                    showcaseList4: 'Clean code & best practices',
+                    showcaseList5: 'Ongoing support & maintenance',
+                    benefitsTitle: 'Why business owners <span class="text-gradient">choose us</span>',
+                    benefitsDesc: 'We\'re not just another web agency. We\'re your growth partner.',
+                    benefit1Title: 'Results-Driven Approach', benefit1Desc: 'We measure success by your business metrics — leads, sales, and ROI. Not just pretty designs.',
+                    benefit2Title: 'Transparent Communication', benefit2Desc: 'No jargon, no surprises. You\'ll always know exactly where your project stands.',
+                    benefit3Title: 'Fast Turnaround', benefit3Desc: 'We respect your time. Most projects are delivered within 2–4 weeks without compromising quality.',
+                    benefit4Title: 'Long-Term Partnership', benefit4Desc: 'We\'re here for the long haul. As your business grows, we grow with you.',
+                    portfolioTitle: 'Recent <span class="text-gradient">work</span>',
+                    portfolioDesc: 'Real projects, real results. See how we\'ve helped businesses like yours.',
+                    portfolio1Title: 'E-Commerce Platform', portfolio1Desc: '+240% revenue growth',
+                    portfolio2Title: 'SaaS Dashboard', portfolio2Desc: '+180% user retention',
+                    portfolio3Title: 'Corporate Website', portfolio3Desc: '+320% qualified leads',
+                    portfolio4Title: 'Local Business', portfolio4Desc: '+150% foot traffic',
+                    portfolio5Title: 'Online Course Platform', portfolio5Desc: '+400% enrollments',
+                    portfolio6Title: 'Healthcare Portal', portfolio6Desc: '+210% patient engagement',
+                    testimonialsTitle: 'What our <span class="text-gradient">clients say</span>',
+                    testimonialsDesc: 'Don\'t just take our word for it — hear from business owners we\'ve helped grow.',
+                    testimonial1Text: '"devloperweb.com transformed our online presence completely. Our leads increased by 320% in the first 3 months. Highly recommended!"',
+                    testimonial1Role: 'CEO, Santoso Retail',
+                    testimonial2Text: '"The team understood our vision immediately. The website they built is not only beautiful but incredibly fast. Our conversion rate doubled."',
+                    testimonial2Role: 'Founder, Wijaya Beauty',
+                    testimonial3Text: '"Professional, responsive, and results-driven. devloperweb.com is the only agency I trust for my web projects. Five stars all the way."',
+                    testimonial3Role: 'Director, Pratama Logistics',
+                    pricingTitle: 'Simple, transparent <span class="text-gradient">pricing</span>',
+                    pricingDesc: 'Choose the perfect plan for your business. No hidden fees.',
+                    pricing1Name: 'Starter', pricing1Period: '/project', pricing1Desc: 'Perfect for small businesses getting started online.',
+                    pricing1Feat1: '5-page custom website', pricing1Feat2: 'Mobile responsive design', pricing1Feat3: 'Basic SEO setup',
+                    pricing1Feat4: 'Contact form integration', pricing1Feat5: '2 rounds of revisions', pricing1Btn: 'Get Started',
+                    pricingBadge: 'Most Popular',
+                    pricing2Name: 'Professional', pricing2Period: '/project', pricing2Desc: 'Ideal for growing businesses that need more power.',
+                    pricing2Feat1: '10-page custom website', pricing2Feat2: 'Advanced responsive design', pricing2Feat3: 'Full SEO optimization',
+                    pricing2Feat4: 'CMS integration', pricing2Feat5: 'Analytics setup', pricing2Feat6: '4 rounds of revisions', pricing2Btn: 'Get Started',
+                    pricing3Name: 'Enterprise', pricing3Period: '/project', pricing3Desc: 'For businesses that demand the absolute best.',
+                    pricing3Feat1: 'Unlimited pages', pricing3Feat2: 'Premium custom design', pricing3Feat3: 'Advanced SEO & marketing',
+                    pricing3Feat4: 'E-commerce integration', pricing3Feat5: 'Priority support', pricing3Feat6: 'Unlimited revisions', pricing3Btn: 'Get Started',
+                    faqTitle: 'Frequently asked <span class="text-gradient">questions</span>',
+                    faqDesc: 'Everything you need to know before working with us.',
+                    faq1Q: 'How long does it take to build a website?',
+                    faq1A: 'Most projects are completed within 2–4 weeks, depending on complexity. We\'ll provide a detailed timeline after our initial consultation.',
+                    faq2Q: 'Do you offer ongoing maintenance?',
+                    faq2A: 'Yes! We offer monthly maintenance packages that include updates, security monitoring, backups, and priority support.',
+                    faq3Q: 'Can I update the website myself?',
+                    faq3A: 'Absolutely. We integrate user-friendly CMS platforms so you can easily update content without any technical knowledge.',
+                    faq4Q: 'What if I\'m not happy with the design?',
+                    faq4A: 'We include multiple revision rounds in every package. Your satisfaction is our priority — we\'ll work until you love it.',
+                    faq5Q: 'Do you provide hosting and domain services?',
+                    faq5A: 'Yes, we can handle everything — domain registration, hosting setup, and SSL certificates. Or we can work with your existing providers.',
+                    ctaTitle: 'Ready to grow your business?',
+                    ctaDesc: 'Get a free consultation and see how we can help you achieve your goals.',
+                    ctaBtn: 'Send via WhatsApp <i class="fab fa-whatsapp"></i>',
+                    ctaInput: 'Enter your name & message',
+                    footerDesc: 'Premium web development for business owners who demand results. We build websites that convert.',
+                    footerServices: 'Services', footerService1: 'Web Development', footerService2: 'UI/UX Design',
+                    footerService3: 'SEO Optimization', footerService4: 'Maintenance',
+                    footerCompany: 'Company', footerCompany1: 'About Us', footerCompany2: 'Portfolio',
+                    footerCompany3: 'Blog', footerCompany4: 'Careers',
+                    footerSupport: 'Support', footerSupport1: 'Contact', footerSupport2: 'FAQ',
+                    footerSupport3: 'Privacy Policy', footerSupport4: 'Terms of Service',
+                    footerCopyright: '&copy; 2025 devloperweb.com. All rights reserved.'
+                }
+            };
+
+            function setLanguage(lang) {
+                const t = translations[lang];
+                if (!t) return;
+                document.documentElement.lang = lang;
+
+                document.querySelectorAll('.nav-links a').forEach((el, i) => {
+                    const key = ['navFeatures', 'navShowcase', 'navPortfolio', 'navPricing', 'navFaq'][i];
+                    if (key && t[key]) el.textContent = t[key];
+                });
+                document.getElementById('navCta').textContent = t.navCta;
+
+                document.getElementById('heroBadge').innerHTML = t.heroBadge;
+                document.getElementById('heroTitle').innerHTML = t.heroTitle;
+                document.getElementById('heroDesc').textContent = t.heroDesc;
+                document.getElementById('heroBtnPrimary').innerHTML = t.heroBtnPrimary;
+                document.getElementById('heroBtnSecondary').textContent = t.heroBtnSecondary;
+                document.getElementById('stat1').textContent = t.stat1;
+                document.getElementById('stat2').textContent = t.stat2;
+                document.getElementById('stat3').textContent = t.stat3;
+
+                document.getElementById('socialProofText').textContent = t.socialProofText;
+
+                document.getElementById('featuresTitle').innerHTML = t.featuresTitle;
+                document.getElementById('featuresDesc').textContent = t.featuresDesc;
+                for (let i = 1; i <= 6; i++) {
+                    const titleEl = document.getElementById('feature' + i + 'Title');
+                    const descEl = document.getElementById('feature' + i + 'Desc');
+                    if (titleEl && t['feature' + i + 'Title']) titleEl.textContent = t['feature' + i + 'Title'];
+                    if (descEl && t['feature' + i + 'Desc']) descEl.textContent = t['feature' + i + 'Desc'];
+                }
+
+                document.getElementById('showcaseTitle').innerHTML = t.showcaseTitle;
+                document.getElementById('showcaseDesc').textContent = t.showcaseDesc;
+                for (let i = 1; i <= 5; i++) {
+                    const el = document.getElementById('showcaseList' + i);
+                    if (el && t['showcaseList' + i]) el.textContent = t['showcaseList' + i];
+                }
+
+                document.getElementById('benefitsTitle').innerHTML = t.benefitsTitle;
+                document.getElementById('benefitsDesc').textContent = t.benefitsDesc;
+                for (let i = 1; i <= 4; i++) {
+                    const titleEl = document.getElementById('benefit' + i + 'Title');
+                    const descEl = document.getElementById('benefit' + i + 'Desc');
+                    if (titleEl && t['benefit' + i + 'Title']) titleEl.textContent = t['benefit' + i + 'Title'];
+                    if (descEl && t['benefit' + i + 'Desc']) descEl.textContent = t['benefit' + i + 'Desc'];
+                }
+
+                document.getElementById('portfolioTitle').innerHTML = t.portfolioTitle;
+                document.getElementById('portfolioDesc').textContent = t.portfolioDesc;
+                for (let i = 1; i <= 6; i++) {
+                    const titleEl = document.getElementById('portfolio' + i + 'Title');
+                    const descEl = document.getElementById('portfolio' + i + 'Desc');
+                    if (titleEl && t['portfolio' + i + 'Title']) titleEl.textContent = t['portfolio' + i + 'Title'];
+                    if (descEl && t['portfolio' + i + 'Desc']) descEl.textContent = t['portfolio' + i + 'Desc'];
+                }
+
+                document.getElementById('testimonialsTitle').innerHTML = t.testimonialsTitle;
+                document.getElementById('testimonialsDesc').textContent = t.testimonialsDesc;
+                for (let i = 1; i <= 3; i++) {
+                    const textEl = document.getElementById('testimonial' + i + 'Text');
+                    const roleEl = document.getElementById('testimonial' + i + 'Role');
+                    if (textEl && t['testimonial' + i + 'Text']) textEl.textContent = t['testimonial' + i + 'Text'];
+                    if (roleEl && t['testimonial' + i + 'Role']) roleEl.textContent = t['testimonial' + i + 'Role'];
+                }
+
+                document.getElementById('pricingTitle').innerHTML = t.pricingTitle;
+                document.getElementById('pricingDesc').textContent = t.pricingDesc;
+                document.getElementById('pricing1Name').textContent = t.pricing1Name;
+                document.getElementById('pricing1Period').textContent = t.pricing1Period;
+                document.getElementById('pricing1Desc').textContent = t.pricing1Desc;
+                for (let i = 1; i <= 5; i++) {
+                    const el = document.getElementById('pricing1Feat' + i);
+                    if (el && t['pricing1Feat' + i]) el.textContent = t['pricing1Feat' + i];
+                }
+                document.getElementById('pricing1Btn').textContent = t.pricing1Btn;
+
+                document.getElementById('pricingBadge').textContent = t.pricingBadge;
+                document.getElementById('pricing2Name').textContent = t.pricing2Name;
+                document.getElementById('pricing2Period').textContent = t.pricing2Period;
+                document.getElementById('pricing2Desc').textContent = t.pricing2Desc;
+                for (let i = 1; i <= 6; i++) {
+                    const el = document.getElementById('pricing2Feat' + i);
+                    if (el && t['pricing2Feat' + i]) el.textContent = t['pricing2Feat' + i];
+                }
+                document.getElementById('pricing2Btn').textContent = t.pricing2Btn;
+
+                document.getElementById('pricing3Name').textContent = t.pricing3Name;
+                document.getElementById('pricing3Period').textContent = t.pricing3Period;
+                document.getElementById('pricing3Desc').textContent = t.pricing3Desc;
+                for (let i = 1; i <= 6; i++) {
+                    const el = document.getElementById('pricing3Feat' + i);
+                    if (el && t['pricing3Feat' + i]) el.textContent = t['pricing3Feat' + i];
+                }
+                document.getElementById('pricing3Btn').textContent = t.pricing3Btn;
+
+                document.getElementById('faqTitle').innerHTML = t.faqTitle;
+                document.getElementById('faqDesc').textContent = t.faqDesc;
+                for (let i = 1; i <= 5; i++) {
+                    const qEl = document.getElementById('faq' + i + 'Q');
+                    const aEl = document.getElementById('faq' + i + 'A');
+                    if (qEl && t['faq' + i + 'Q']) qEl.textContent = t['faq' + i + 'Q'];
+                    if (aEl && t['faq' + i + 'A']) aEl.textContent = t['faq' + i + 'A'];
+                }
+
+                document.getElementById('ctaTitle').textContent = t.ctaTitle;
+                document.getElementById('ctaDesc').textContent = t.ctaDesc;
+                document.getElementById('ctaBtn').innerHTML = t.ctaBtn;
+                document.getElementById('ctaInput').placeholder = t.ctaInput;
+
+                document.getElementById('footerDesc').textContent = t.footerDesc;
+                document.getElementById('footerServices').textContent = t.footerServices;
+                document.getElementById('footerService1').textContent = t.footerService1;
+                document.getElementById('footerService2').textContent = t.footerService2;
+                document.getElementById('footerService3').textContent = t.footerService3;
+                document.getElementById('footerService4').textContent = t.footerService4;
+                document.getElementById('footerCompany').textContent = t.footerCompany;
+                document.getElementById('footerCompany1').textContent = t.footerCompany1;
+                document.getElementById('footerCompany2').textContent = t.footerCompany2;
+                document.getElementById('footerCompany3').textContent = t.footerCompany3;
+                document.getElementById('footerCompany4').textContent = t.footerCompany4;
+                document.getElementById('footerSupport').textContent = t.footerSupport;
+                document.getElementById('footerSupport1').textContent = t.footerSupport1;
+                document.getElementById('footerSupport2').textContent = t.footerSupport2;
+                document.getElementById('footerSupport3').textContent = t.footerSupport3;
+                document.getElementById('footerSupport4').textContent = t.footerSupport4;
+                document.getElementById('footerCopyright').innerHTML = t.footerCopyright;
+            }
+
+            langSpans.forEach(span => {
+                span.addEventListener('click', function() {
+                    langSpans.forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+                    const lang = this.dataset.lang;
+                    setLanguage(lang);
+                });
+            });
+
+            setLanguage('id');
+
+            // ---------- MOBILE MENU ----------
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            menuToggle.addEventListener('click', () => {
+                const isVisible = navLinks.style.display === 'flex';
+                if (isVisible) {
+                    navLinks.style.display = '';
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                } else {
+                    navLinks.style.display = 'flex';
+                    navLinks.style.flexDirection = 'column';
+                    navLinks.style.position = 'absolute';
+                    navLinks.style.top = '100%';
+                    navLinks.style.left = '0';
+                    navLinks.style.width = '100%';
+                    navLinks.style.background = 'rgba(255, 255, 255, 0.98)';
+                    navLinks.style.backdropFilter = 'blur(20px)';
+                    navLinks.style.padding = '24px';
+                    navLinks.style.borderBottom = '1px solid var(--gray-200)';
+                    navLinks.style.gap = '20px';
+                    menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+                }
+            });
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        navLinks.style.display = '';
+                        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    navLinks.style.display = '';
+                    navLinks.style.position = '';
+                    navLinks.style.flexDirection = '';
+                    navLinks.style.background = '';
+                    navLinks.style.padding = '';
+                    navLinks.style.borderBottom = '';
+                    navLinks.style.gap = '';
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+
+            // ---------- SMOOTH SCROLL ----------
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        const offsetTop = target.getBoundingClientRect().top + window.pageYOffset - 80;
+                        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // ---------- AMBIENT MOTION ----------
+            const heroCard = document.querySelector('.hero-card');
+            if (heroCard && window.innerWidth > 1024) {
+                document.addEventListener('mousemove', (e) => {
+                    const x = (e.clientX / window.innerWidth - 0.5) * 6;
+                    const y = (e.clientY / window.innerHeight - 0.5) * 6;
+                    heroCard.style.transform = `perspective(1000px) rotateY(${-5 + x}deg) rotateX(${5 + y}deg)`;
+                });
+            }
+
+            // ---------- RIPPLE EFFECT ----------
+            document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta, .pricing-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.5);
+                        transform: translate(-50%, -50%) scale(0);
+                        left: ${x}px;
+                        top: ${y}px;
+                        pointer-events: none;
+                        animation: ripple 0.6s ease-out;
+                    `;
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: translate(-50%, -50%) scale(15);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+        })();
+    </script>
+</body>
+</html>
