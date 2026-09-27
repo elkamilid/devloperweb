@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://devloperweb.com/sitemap.xml
+
+# Crawl-delay for bots that support it
+Crawl-delay: 1
